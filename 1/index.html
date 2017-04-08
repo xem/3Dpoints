@@ -1,0 +1,80 @@
+<meta charset=utf-8>
+<canvas id=a width=640 height=480></canvas>
+
+<script>
+rotateX = (point, angle) => {
+  rad = angle * Math.PI / 180
+  cosa = Math.cos(rad)
+  sina = Math.sin(rad)
+  y = point[1] * cosa - point[2] * sina
+  z = point[1] * sina + point[2] * cosa
+  return [point[0], y, z]
+}
+
+rotateY = (point, angle) => {
+  rad = angle * Math.PI / 180
+  cosa = Math.cos(rad)
+  sina = Math.sin(rad)
+  z = point[2] * cosa - point[0] * sina
+  x = point[2] * sina + point[0] * cosa
+  return [x, point[1], z]
+}
+
+rotateZ = (point, angle) => {
+  rad = angle * Math.PI / 180
+  cosa = Math.cos(rad)
+  sina = Math.sin(rad)
+  x = point[0] * cosa - point[1] * sina
+  y = point[0] * sina + point[1] * cosa
+  return [x, y, point[2]]
+}
+
+project = (point, win_width, win_height, fov, viewer_distance) => {
+  factor = fov / (viewer_distance + point[2])
+  x = point[0] * factor + win_width / 2
+  y = -point[1] * factor + win_height / 2
+  return [x, y, 1]
+}
+
+init = () => {
+
+  c = a.getContext("2d")
+
+  vertices = [
+    [-1,1,-1],
+    [1,1,-1],
+    [1,-1,-1],
+    [-1,-1,-1],
+    [-1,1,1],
+    [1,1,1],
+    [1,-1,1],
+    [-1,-1,1]
+  ]
+
+  angleX = angleY = angleZ = 0
+}
+
+run = () => {
+
+  a.width ^= 1
+  for(v in vertices){
+    r = vertices[v]
+    r = rotateX(r, angleX)
+    r = rotateY(r, angleY)
+    r = rotateZ(r, angleZ)
+    p = project(r, a.width, a.height, 256, 4)
+    x = p[0]
+    y = p[1]
+    c.fillRect(x,y,factor/10, factor/10)
+  }
+
+  angleX += 1
+  angleY += 1
+  angleZ += 1
+}
+
+init()
+
+setInterval(run, 33)
+
+</script>

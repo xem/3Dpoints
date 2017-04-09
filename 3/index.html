@@ -1,0 +1,83 @@
+<meta charset=utf-8>
+<body bgcolor=0>
+<canvas id=a></canvas>
+
+<script>
+rotateX = (point, angle) => {
+  rad = angle * Math.PI / 180
+  cosa = Math.cos(rad)
+  sina = Math.sin(rad)
+  y = point[1] * cosa - point[2] * sina
+  z = point[1] * sina + point[2] * cosa
+  return [point[0], y, z]
+}
+
+rotateY = (point, angle) => {
+  rad = angle * Math.PI / 180
+  cosa = Math.cos(rad)
+  sina = Math.sin(rad)
+  z = point[2] * cosa - point[0] * sina
+  x = point[2] * sina + point[0] * cosa
+  return [x, point[1], z]
+}
+
+rotateZ = (point, angle) => {
+  rad = angle * Math.PI / 180
+  cosa = Math.cos(rad)
+  sina = Math.sin(rad)
+  x = point[0] * cosa - point[1] * sina
+  y = point[0] * sina + point[1] * cosa
+  return [x, y, point[2]]
+}
+
+project = (point, win_width, win_height, fov, viewer_distance) => {
+  factor = fov / (viewer_distance + point[2])
+  x = point[0] * factor + win_width / 2
+  y = -point[1] * factor + win_height / 2
+  return [x, y, 1]
+}
+
+init = () => {
+
+  c = a.getContext("2d")
+
+  vertices = [];
+
+  for(i = -5; i <= 5; i += .5){
+    for(j = -5; j <= 5; j += .5){
+      for(k = -5; k <= 5; k += .5){
+        vertices.push([i,j,k]);
+      }
+    }
+  }
+
+  angleX = angleY = angleZ = 0
+}
+
+run = () => {
+
+  a.width = innerWidth - 20
+  a.height = innerHeight - 20
+  c.fillStyle = "#fff";
+  for(v in vertices){
+    r = vertices[v]
+    r = rotateX(r, angleX)
+    r = rotateY(r, angleY)
+    r = rotateZ(r, angleZ)
+    p = project(r, a.width, a.height, 512, 4)
+    x = p[0]
+    y = p[1]
+    if(factor > 0)
+      c.fillRect(x,y,1, 1)
+  }
+
+  angleX += 1
+  angleY += 1
+  angleZ += 1
+}
+
+init()
+
+setInterval(run, 33)
+
+</script>
